@@ -11,21 +11,8 @@ public class EntradaJugador : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Jump");
-        }
-        if (Input.GetButton("Jump"))
-        {
+        Vector2 entradaJugador = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        }
-        if (Input.GetMouseButton(0))
-        {
-
-        }
-        if (Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-
-        }
+        //Debug.Log(entradaJugador.normalized.magnitude);
     }
 }
