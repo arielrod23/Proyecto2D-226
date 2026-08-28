@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class ControlChica : MonoBehaviour
 {
@@ -6,15 +7,17 @@ public class ControlChica : MonoBehaviour
     [SerializeField] private float fuerzaSalto = 6f;
     [SerializeField] private bool pisando;
     [SerializeField] private bool muerto;
-    [SerializeField] private bool disparando;
+    [SerializeField] public bool disparando;
 
     [SerializeField] Rigidbody2D miCuerpo;
 
     [SerializeField] Animator miAnimador;
 
-    [SerializeField] ProyectilChica proyectil;
+    //Logica de disparo
+    //[SerializeField] ProyectilChica proyectil;
     [SerializeField] GameObject proyectilObj;
     [SerializeField] Transform puntaPistola;
+    [SerializeField] public Light2D luzPistola;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,7 +32,7 @@ public class ControlChica : MonoBehaviour
             return;
 
         float entradaX = Input.GetAxis("Horizontal");
-        Debug.Log("el jugador esta presionando " + entradaX);
+        //Debug.Log("el jugador esta presionando " + entradaX);
         //Debug.Log("tiempo delta " + Time.deltaTime);
 
         //verificando si el jugador quiere moverse
@@ -52,19 +55,26 @@ public class ControlChica : MonoBehaviour
         //leyendo la tecla de salto
         if (Input.GetButtonDown("Jump") && pisando)
         {
+            //impulse = fuerza instantanea, Force = fuerza continua
             miCuerpo.AddForceY(fuerzaSalto, ForceMode2D.Impulse);
         }
 
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && !disparando)
         {
             miAnimador.SetTrigger("disparo");
-            GameObject nuevoProyectil = Instantiate(proyectilObj, puntaPistola.position, puntaPistola.rotation);
-            nuevoProyectil.GetComponent<ProyectilChica>().AplicarFuerza(Mathf.Sign(transform.localScale.x));
         }
 
         //actualizamos variables de salto en el animador
         miAnimador.SetBool("pisando", pisando);
         miAnimador.SetFloat("velY", miCuerpo.linearVelocityY);
+    }
+
+    public void Disparar()
+    {
+        luzPistola.enabled = true;
+        disparando = true;
+        GameObject nuevoProyectil = Instantiate(proyectilObj, puntaPistola.position, puntaPistola.rotation);
+        nuevoProyectil.GetComponent<ProyectilChica>().AplicarFuerza(Mathf.Sign(transform.localScale.x));
     }
 
     void GirarPersonaje()
