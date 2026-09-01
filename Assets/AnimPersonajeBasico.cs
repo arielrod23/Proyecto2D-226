@@ -5,35 +5,33 @@ public class AnimPersonajeBasico : MonoBehaviour
 {
     [SerializeField] private float velocidad = 4f;
     [SerializeField] private float fuerzaSalto = 6f;
+    [SerializeField] private bool pisando;
     [SerializeField] private bool saltando;
     [SerializeField] private bool muerto;
 
     [SerializeField] Rigidbody2D miCuerpo;
     public Animator miAnimador;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
 
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (muerto)
             return;
 
-
         float entradaX = Input.GetAxis("Horizontal");
         Debug.Log("el jugador esta presionando " + entradaX);
         //Debug.Log("tiempo delta " + Time.deltaTime);
 
-
-        //jugador quiere moverse
+        //verificando si el jugador quiere moverse
         if (entradaX != 0)
         {
-            transform.Translate(new Vector2(entradaX * Time.deltaTime * velocidad, 0));
-            miCuerpo.lineaVelocityX = entradaX * velocidad;
+            //transform.Translate(new Vector2(entradaX * Time.deltaTime * velocidad, 0));
+            miCuerpo.linearVelocityX = entradaX * velocidad;
+        }
 
             miAnimador.SetBool("caminando", true);
 
@@ -61,21 +59,17 @@ public class AnimPersonajeBasico : MonoBehaviour
         {
             muerto = true;
             miAnimador.SetBool("muerto", muerto);
-        }
-
-        void DañarPersonaje()
-        {
             miAnimador.SetTrigger("daño");
         }
 
         //leyendo la tecla de salto
         if (Input.GetButtonDown("Jump") && pisando)
         {
-            miCuerpo.AddForce((fuerzaSalto), ForceMode2D.Impulse);
+            miCuerpo.AddForce(new Vector2(0, fuerzaSalto), ForceMode2D.Impulse);
         }
 
         miAnimador.SetBool("pisando", pisando);
-        miAnimator.SetFloat("velY", miCuerpo.linearVelocityY);
+        miAnimador.SetFloat("velY", miCuerpo.linearVelocityY);
 
     void GirarPersonaje()
     {
@@ -84,6 +78,21 @@ public class AnimPersonajeBasico : MonoBehaviour
                                             transform.localScale.z);
     }
 
+    private void OnGUI()
+    {
+        Rect btnMuerto = new Rect(10, 10, 100, 50);
+        Rect btnDaño = new Rect(10, 80, 100, 50);
+
+        if (GUI.Button(btnMuerto, "Matar"))
+        {
+            MatarPersonaje();
+        }
+
+        if (GUI.Button(btnDaño, "Dañar"))
+        {
+            DañarPersonaje();
+        }
+    }
     void MatarPersonaje()
     {
         muerto = true;
@@ -92,7 +101,11 @@ public class AnimPersonajeBasico : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.transform.CompareTag("piso"))
+        if (collision.transform.CompareTag("piso"))
+        {
+            pisando = true;
+        }
+    }
         {
             pisando = true;
         }
@@ -106,4 +119,7 @@ public class AnimPersonajeBasico : MonoBehaviour
         }
     }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+    }
 }
